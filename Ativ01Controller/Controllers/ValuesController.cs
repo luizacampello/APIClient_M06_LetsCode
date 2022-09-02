@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Ativ01Controller.Repository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Ativ01Controller.Controllers
 {
@@ -11,114 +13,100 @@ namespace Ativ01Controller.Controllers
     {
         public List<Person> UserRepository { get; set; }
 
-        public ValuesController()
-        {
+        public PersonRepository _personRepository { get; set; }
 
-            UserRepository = new()
-            {
-                new Person("Matheus", "12365478911", DateTime.Parse("05/06/2002")),
-                new Person("Mateus", "10624900614", DateTime.Parse("09/01/2003")),
-                new Person("Luiza", "12365471911", DateTime.Parse("09/01/1996"))
-            };
+        public ValuesController(IConfiguration configuration)
+        {
+            UserRepository = new List<Person>();
+            _personRepository = new PersonRepository(configuration);
+
         }
 
-        [HttpGet("person/getUserRepository")]
+        [HttpGet("person/getPersonRepository")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-
-        public ActionResult<List<Person>> GetUserRepository()
+        public ActionResult<List<Person>> GetPersonRepository()
         {
-            return Ok(UserRepository);
+            return Ok(_personRepository.GetPersonRepository());
+        }
+
+        [HttpGet("person/{personCPF}/getPersonByCPF")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Person> GetPersonByCPF(string personCPF)
+        {
+            Person person = _personRepository.GetPersonByCPF(personCPF);
+
+            if (person is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(person);
         }
 
         [HttpPost("person/register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-
         public ActionResult<Person> AddPerson(Person newPerson)
         {
-            UserRepository.Add(newPerson);
-            return StatusCode(201, newPerson);
-        }
-
-        [HttpPut("person/{userIndex}/editPersonInfoByIndex")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status202Accepted)]
-
-        public ActionResult<List<Person>> EditPersonInfoByIndex(int userIndex, Person changePerson)
-        {
-            if(userIndex >= UserRepository.Count || userIndex < 0)
+            if (!_personRepository.AddPerson(newPerson))
             {
                 return BadRequest();
             }
-            
-            List<Person> personChanges = new()
-            {
-                UserRepository[userIndex],
-                changePerson
-            };
 
-            UserRepository[userIndex] = changePerson;
-
-            return Accepted(personChanges);
+            return CreatedAtAction(nameof(AddPerson), newPerson);
         }
 
         [HttpPut("person/{personCPF}/editPersonInfoByCPF")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
-
         public ActionResult<List<Person>> EditPersonInfoByCPF(string personCPF, Person changePerson)
         {
-            int indexOf = UserRepository.FindIndex(person => person.CPF == personCPF);
+            Person person = _personRepository.GetPersonByCPF(personCPF);
 
-            if (indexOf != -1)
+            List<Person> personChanges = new()
             {
-                List<Person> personChanges = new()
+                person
+            };
+
+            if (person is not null)
+            {
+                if (_personRepository.EditPersonInfoByCPF(personCPF, changePerson))
                 {
-                UserRepository[indexOf],
-                changePerson
-                };
-
-                UserRepository[indexOf] = changePerson;
-
-                return StatusCode(202, personChanges);
+                    Person newPerson = _personRepository.GetPersonByCPF(changePerson.cpf);
+                    personChanges.Add(newPerson);
+                    return StatusCode(202, personChanges);
+                }
             }
 
             return NotFound();
+
         }
 
-        [HttpDelete("person/{userIndex}/DeletePersonByIndex")]
+        [HttpDelete("person/{userId}/DeletePersonById")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-
-        public IActionResult DeletePersonByIndex(int userIndex)
+        public IActionResult DeletePersonById(long userId)
         {
-            if (userIndex >= UserRepository.Count || userIndex < 0)
+            if (!_personRepository.DeletePersonById(userId))
             {
                 return NotFound();
             }
-
-            UserRepository.RemoveAt(userIndex);
-
             return NoContent();
         }
 
         [HttpDelete("person/{personCPF}/DeletePersonByCPF")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-
         public IActionResult DeletePersonByCPF(string personCPF)
         {
-            int indexOf = UserRepository.FindIndex(person => person.CPF == personCPF);
-
-            if (indexOf != -1)
+            if (!_personRepository.DeletePersonByCPF(personCPF))
             {
-                UserRepository.RemoveAt(indexOf);
-                return NoContent();
+                return NotFound();
             }
+            return NoContent();
 
-            return NotFound();
-            
         }
     }
 }
