@@ -25,7 +25,6 @@ namespace Ativ01Controller
 
         public Person(long id, string name, string CPF, DateTime birthDate, int age)
         {
-            this.id = id;
             nome = name;
             this.cpf = CPF;
             dataNascimento = birthDate;

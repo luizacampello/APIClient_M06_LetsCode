@@ -1,3 +1,8 @@
+using Ativ01Controller.Core;
+using Ativ01Controller.Core.Interfaces;
+using Ativ01Controller.Filters;
+using Ativ01Controller.Repository;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +12,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped< IPersonService, PersonService > ();
+builder.Services.AddScoped<IPersonRepository, PersonRepository > ();
+
+builder.Services.AddScoped<UpdateValidationActionFilter>();
+builder.Services.AddScoped<PersonValidationActionFilter> ();
 
 var app = builder.Build();
 

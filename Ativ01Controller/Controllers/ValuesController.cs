@@ -1,7 +1,6 @@
-﻿using Ativ01Controller.Repository;
-using Microsoft.AspNetCore.Http;
+﻿using Ativ01Controller.Core.Interfaces;
+using Ativ01Controller.Filters;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace Ativ01Controller.Controllers
 {
@@ -9,24 +8,22 @@ namespace Ativ01Controller.Controllers
     [Route("[controller]")]
     [Consumes("application/json")]
     [Produces("application/json")]
+    [TypeFilter(typeof(TimeResourceFilter))]
     public class ValuesController : ControllerBase
     {
-        public List<Person> UserRepository { get; set; }
 
-        public PersonRepository _personRepository { get; set; }
+        public IPersonService _personService { get; set; }
 
-        public ValuesController(IConfiguration configuration)
+        public ValuesController(IPersonService personService)
         {
-            UserRepository = new List<Person>();
-            _personRepository = new PersonRepository(configuration);
-
+            _personService = personService;
         }
 
         [HttpGet("person/getPersonRepository")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<List<Person>> GetPersonRepository()
         {
-            return Ok(_personRepository.GetPersonRepository());
+            return Ok(_personService.GetPersonRepository());
         }
 
         [HttpGet("person/{personCPF}/getPersonByCPF")]
@@ -34,7 +31,7 @@ namespace Ativ01Controller.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<Person> GetPersonByCPF(string personCPF)
         {
-            Person person = _personRepository.GetPersonByCPF(personCPF);
+            Person person = _personService.GetPersonByCPF(personCPF);
 
             if (person is null)
             {
@@ -47,9 +44,11 @@ namespace Ativ01Controller.Controllers
         [HttpPost("person/register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [TypeFilter(typeof(PersonValidationActionFilter))]
         public ActionResult<Person> AddPerson(Person newPerson)
         {
-            if (!_personRepository.AddPerson(newPerson))
+            if (!_personService.AddPerson(newPerson))
             {
                 return BadRequest();
             }
@@ -61,9 +60,10 @@ namespace Ativ01Controller.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [TypeFilter(typeof(UpdateValidationActionFilter))]
         public ActionResult<List<Person>> EditPersonInfoByCPF(string personCPF, Person changePerson)
         {
-            Person person = _personRepository.GetPersonByCPF(personCPF);
+            Person person = _personService.GetPersonByCPF(personCPF);
 
             List<Person> personChanges = new()
             {
@@ -72,9 +72,9 @@ namespace Ativ01Controller.Controllers
 
             if (person is not null)
             {
-                if (_personRepository.EditPersonInfoByCPF(personCPF, changePerson))
+                if (_personService.EditPersonInfoByCPF(personCPF, changePerson))
                 {
-                    Person newPerson = _personRepository.GetPersonByCPF(changePerson.cpf);
+                    Person newPerson = _personService.GetPersonByCPF(changePerson.cpf);
                     personChanges.Add(newPerson);
                     return StatusCode(202, personChanges);
                 }
@@ -89,7 +89,7 @@ namespace Ativ01Controller.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult DeletePersonById(long userId)
         {
-            if (!_personRepository.DeletePersonById(userId))
+            if (!_personService.DeletePersonById(userId))
             {
                 return NotFound();
             }
@@ -101,7 +101,7 @@ namespace Ativ01Controller.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DeletePersonByCPF(string personCPF)
         {
-            if (!_personRepository.DeletePersonByCPF(personCPF))
+            if (!_personService.DeletePersonByCPF(personCPF))
             {
                 return NotFound();
             }

@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ativ01Controller", "Ativ01Controller\Ativ01Controller.csproj", "{9660D8C6-F923-4BC2-9FC7-8122482586C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ativ01Controller", "Ativ01Controller\Ativ01Controller.csproj", "{9660D8C6-F923-4BC2-9FC7-8122482586C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ativ01Controller.Core", "Ativ01Controller.Core\Ativ01Controller.Core.csproj", "{3A614C88-C21B-439D-9844-51A13C2DE49F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ativ01Controller.Infra.Data", "Ativ01Controller.Infra.Data\Ativ01Controller.Infra.Data.csproj", "{FD154666-23F6-4D11-A475-338CC2EEED4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{9660D8C6-F923-4BC2-9FC7-8122482586C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9660D8C6-F923-4BC2-9FC7-8122482586C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9660D8C6-F923-4BC2-9FC7-8122482586C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A614C88-C21B-439D-9844-51A13C2DE49F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A614C88-C21B-439D-9844-51A13C2DE49F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A614C88-C21B-439D-9844-51A13C2DE49F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A614C88-C21B-439D-9844-51A13C2DE49F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD154666-23F6-4D11-A475-338CC2EEED4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD154666-23F6-4D11-A475-338CC2EEED4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD154666-23F6-4D11-A475-338CC2EEED4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD154666-23F6-4D11-A475-338CC2EEED4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

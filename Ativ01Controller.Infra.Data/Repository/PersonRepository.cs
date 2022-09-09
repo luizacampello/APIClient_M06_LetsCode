@@ -1,10 +1,11 @@
-﻿using Dapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Ativ01Controller.Core.Interfaces;
+using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace Ativ01Controller.Repository
 {
-    public class PersonRepository
+    public class PersonRepository : IPersonRepository
     {
         private readonly IConfiguration _configuration;
 
@@ -95,5 +96,6 @@ namespace Ativ01Controller.Repository
             return conn.Execute(query, parameters) == 1;
 
         }
+
     }
 }
